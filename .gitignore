@@ -1,0 +1,29 @@
+# Secrets
+.env
+*.pem
+serviceAccountKey.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.DS_Store
+
+# Generated data
+data/raw/
+output/
+*.log
+
+# Editors
+.idea/
+.vscode/
+*.swp

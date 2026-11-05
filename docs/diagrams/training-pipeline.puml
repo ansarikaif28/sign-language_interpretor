@@ -1,0 +1,48 @@
+@startuml silent-voice-training-pipeline
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EDF2F7
+skinparam ActivityBorderColor #A0AEC0
+skinparam ActivityDiamondBackgroundColor #FEFCBF
+skinparam ActivityDiamondBorderColor #D69E2E
+skinparam ArrowColor #4A5568
+
+title From webcam footage to a trained model
+
+start
+
+:collect.py
+hold a sign, press Q
+100 frames per class;
+:data/raw/<class>/*.jpg\n25 classes;
+
+repeat
+  :dataset.py\nread the next image;
+  if (MediaPipe finds a hand?) then (yes)
+    :21 landmarks\n→ (x−min x, y−min y)\n= 42 features;
+    :append one row;
+  else (no)
+    :count as skipped
+    (kept images only);
+  endif
+repeat while (more images?) is (yes)
+
+:data/data.pickle\nrows × 42 + label;
+
+:train.py\ntrain_test_split(stratify=y);
+:RandomForestClassifier\n100 trees;
+
+if (hold-out accuracy) then
+  :print accuracy\n+ per-class report;
+endif
+
+:models/model.p
+{"model": ...};
+
+:SignClassifier
+loads it once at startup;
+
+stop
+@enduml

@@ -1,0 +1,45 @@
+@startuml silent-voice-recognition-sequence
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.2
+skinparam ParticipantBackgroundColor #EDF2F7
+skinparam ParticipantBorderColor #A0AEC0
+skinparam ActorBackgroundColor #EDF2F7
+skinparam DatabaseBackgroundColor #E6FFFA
+skinparam SequenceGroupBackgroundColor #F7FAFC
+
+title Real-time sign recognition — one frame of the webcam loop
+
+actor "User" as user
+participant "predict.run_webcam()" as loop
+participant "OpenCV\nVideoCapture" as cam
+participant "MediaPipe\nHands" as hands
+participant "landmarks.py" as lm
+participant "SignClassifier" as clf
+database "model.p" as model
+
+loop until Q is pressed
+  loop --> cam : read()
+  cam --> loop : BGR frame
+  loop -> hands : process(RGB frame)
+  hands --> loop : hand_landmarks or nothing
+
+  alt a hand is visible
+    loop -> lm : features_from_hand()
+    lm --> loop : 42 floats
+    loop -> clf : predict(features)
+    clf -> model : model.predict(...)
+    model --> clf : class index
+    clf --> loop : (index, character)
+    loop -> loop : draw box + landmarks + label
+  else no hand
+    loop -> loop : show the frame untouched
+  end
+
+  loop --> user : cv2.imshow("Silent Voice")
+end
+
+loop -> cam : release()
+@enduml
