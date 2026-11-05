@@ -1,0 +1,64 @@
+@startuml silent-voice-architecture
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam ArrowColor #4A5568
+skinparam ArrowFontColor #2D3748
+skinparam ComponentBorderColor #A0AEC0
+skinparam ComponentBackgroundColor #EDF2F7
+skinparam PackageBorderColor #718096
+skinparam DatabaseBackgroundColor #E6FFFA
+skinparam DatabaseBorderColor #38B2AC
+skinparam CloudBackgroundColor #FEFCBF
+skinparam CloudBorderColor #D69E2E
+
+title Silent Voice — component overview
+
+left to right direction
+
+actor "User" as user
+
+package "silent_voice.ui" {
+  component "login.py" as login
+  component "signup.py" as signup
+  component "home.py" as home
+}
+
+package "silent_voice" {
+  component "auth.py\nFirebase REST" as auth
+  component "config.py\npaths + .env" as config
+}
+
+package "silent_voice.vision" {
+  component "predict.py\nSignClassifier" as predict
+  component "landmarks.py\nlandmarks → features + labels" as landmarks
+  component "collect.py" as collect
+  component "dataset.py" as dataset
+  component "train.py" as train
+}
+
+cloud "Firebase\nIdentity Toolkit" as firebase
+database "models/model.p\nRandomForest" as model
+database "data/data.pickle\n2,399 × 42" as pickle
+
+user --> login
+user --> signup
+login --> home
+signup --> home
+login --> auth
+signup --> auth
+auth --> firebase
+
+home --> predict
+predict --> landmarks
+predict --> model
+
+collect --> dataset
+dataset --> pickle
+train --> pickle
+train --> model
+
+config ..> auth
+
+@enduml

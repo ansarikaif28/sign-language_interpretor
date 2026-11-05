@@ -1,0 +1,42 @@
+@startuml silent-voice-navigation
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam StateBackgroundColor #EDF2F7
+skinparam StateBorderColor #A0AEC0
+skinparam ArrowColor #4A5568
+skinparam ArrowFontColor #2D3748
+
+title Screen flow
+
+state "Login" as login
+state "Sign Up" as signup
+state "Dashboard" as dashboard
+state "Live interpreter" as live
+
+[*] --> login
+
+login --> signup : no account yet?
+signup --> login : already registered?
+
+login --> dashboard : credentials accepted
+signup --> dashboard : account created
+
+dashboard --> live : Letters / Numbers card
+live --> dashboard : Q pressed
+
+dashboard --> [*] : window closed
+login --> [*] : window closed
+
+note right of login
+  A rejected sign-in stays on the
+  screen and shows the Firebase
+  error message in a dialog.
+end note
+
+note bottom of live
+  Runs on a worker thread so the
+  Tk event loop keeps responding.
+end note
+
+@enduml
